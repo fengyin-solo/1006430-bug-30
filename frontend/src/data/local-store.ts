@@ -54,6 +54,28 @@ export function resetRows(key: string): EntryRow[] {
   return rows
 }
 
+// 业务旁路数据（如检索命中的待核对台账）：与业务记录分开存，避免互相污染。
+export function readJson<T>(key: string, fallback: T): T {
+  if (typeof window === 'undefined' || !window.localStorage) {
+    return clone(fallback)
+  }
+  const raw = window.localStorage.getItem(key)
+  if (!raw) {
+    return clone(fallback)
+  }
+  try {
+    return JSON.parse(raw) as T
+  } catch {
+    return clone(fallback)
+  }
+}
+
+export function writeJson<T>(key: string, value: T): void {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem(key, JSON.stringify(value))
+  }
+}
+
 export function storageKey(): string {
   return STORAGE_KEY
 }
